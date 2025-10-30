@@ -1,6 +1,6 @@
 // API Service for Tray Inventory Management System
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://coretrack.onrender.com/api/v1';
 
 // Token management
 let accessToken: string | null = localStorage.getItem('access_token');
