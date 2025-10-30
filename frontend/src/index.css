@@ -1,0 +1,118 @@
+@import "../design-system.css";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  line-height: 1.5;
+  font-weight: 400;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Mobile viewport height fix */
+  --vh: 1vh;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+  min-height: calc(var(--vh, 1vh) * 100);
+
+  /* Apply design system appearance */
+  font-family: var(--font-family-sans);
+  color: var(--color-neutral-900);
+  background-color: var(--color-neutral-50);
+
+  /* Prevent pull-to-refresh on mobile */
+  overscroll-behavior-y: contain;
+}
+
+#root {
+  width: 100%;
+  margin: 0 auto;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Mobile-specific utilities */
+@layer utilities {
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
+/* Fix for mobile viewport height */
+@supports (-webkit-touch-callout: none) {
+  body {
+    min-height: -webkit-fill-available;
+  }
+}
+
+/* Custom scrollbar for better mobile experience */
+@layer utilities {
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 2px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* Prevent text selection on buttons and interactive elements */
+button, select {
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Better touch targets for mobile */
+@media (max-width: 768px) {
+  button, a, select, input[type="checkbox"], input[type="radio"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Ensure all form inputs have visible text */
+input, select, textarea {
+  color: #000 !important;
+}
+
+input::placeholder, textarea::placeholder {
+  color: #94a3b8 !important;
+  opacity: 1;
+}
+
+/* Override any conflicting styles */
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="password"],
+select,
+textarea {
+  background-color: white;
+  color: #000 !important;
+}

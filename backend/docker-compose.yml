@@ -1,0 +1,86 @@
+# version: '3.8'
+
+# services:
+#   # MySQL Database
+#   db:
+#     image: mysql:8.0
+#     container_name: tray_inventory_db
+#     restart: unless-stopped
+#     environment:
+#       MYSQL_ROOT_PASSWORD: test123
+#       MYSQL_DATABASE: tray_inventory
+#     ports:
+#       - "3306:3306"
+#     volumes:
+#       - mysql_data:/var/lib/mysql
+#       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+#     networks:
+#       - tray_network
+#     healthcheck:
+#       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+#       interval: 10s
+#       timeout: 5s
+#       retries: 5
+
+#   # Backend API
+#   backend:
+#     build:
+#       context: .
+#       dockerfile: Dockerfile
+#     container_name: tray_inventory_backend
+#     restart: unless-stopped
+#     environment:
+#       DATABASE_HOST: db
+#       DATABASE_PORT: 3306
+#       DATABASE_USER: root
+#       DATABASE_PASSWORD: test123
+#       DATABASE_NAME: tray_inventory
+#       SECRET_KEY: RJ-hGtJpimsdF503yZ2y6TT9SKAVkC3YsvKpXG3cHPKUtMLcXUhIeptrv5Z0FXc5duadEe4tqpXlDNn4ci3zBg
+#       DEBUG: True
+#     ports:
+#       - "8000:8000"
+#     depends_on:
+#       db:
+#         condition: service_healthy
+#     volumes:
+#       - ./app:/app/app
+#     networks:
+#       - tray_network
+#     command: >
+#       sh -c "
+#         echo 'Waiting for database...' &&
+#         sleep 10 &&
+#         python scripts/init_db.py &&
+#         python scripts/seed_data.py &&
+#         uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+#       "
+
+# volumes:
+#   mysql_data:
+#     driver: local
+
+# networks:
+#   tray_network:
+#     driver: bridge
+
+
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tray_inventory_backend
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/app/app
+    command: >
+      sh -c "
+        echo 'Waiting for Aiven DB...' &&
+        sleep 5 &&
+        uvicorn app.main:app --host 0.0.0.0 --port 8000
+      "
