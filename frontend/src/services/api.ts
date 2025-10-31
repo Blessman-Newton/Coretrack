@@ -1,6 +1,8 @@
 // API Service for Tray Inventory Management System
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://coretrack.onrender.com/api/v1';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+const API_VERSION = '/api/v1';
+const FULL_API_URL = `${API_BASE_URL}${API_VERSION}`;
 
 // Token management
 let accessToken: string | null = localStorage.getItem('access_token');
@@ -36,7 +38,7 @@ async function apiRequest<T>(
     headers['Authorization'] = `Bearer ${accessToken}`;
   }
 
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+  const response = await fetch(`${FULL_API_URL}${endpoint}`, {
     ...options,
     headers,
   });
@@ -50,7 +52,7 @@ async function apiRequest<T>(
         ...headers,
         'Authorization': `Bearer ${newToken}`,
       };
-      const retryResponse = await fetch(`${API_BASE_URL}${endpoint}`, {
+      const retryResponse = await fetch(`${FULL_API_URL}${endpoint}`, {
         ...options,
         headers: retryHeaders,
       });
@@ -75,7 +77,7 @@ async function apiRequest<T>(
 
 async function refreshAccessToken(): Promise<string | null> {
   try {
-    const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
+    const response = await fetch(`${FULL_API_URL}/auth/refresh`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ refresh_token: refreshToken }),
@@ -209,7 +211,7 @@ export const reportsAPI = {
       headers['Authorization'] = `Bearer ${accessToken}`;
     }
 
-    const response = await fetch(`${API_BASE_URL}/reports/export${query ? `?${query}` : ''}`, { headers });
+    const response = await fetch(`${FULL_API_URL}/reports/export${query ? `?${query}` : ''}`, { headers });
     if (!response.ok) throw new Error('Export failed');
     
     const blob = await response.blob();
