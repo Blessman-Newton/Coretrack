@@ -2,7 +2,6 @@
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://coretrack.onrender.com/api/v1';
 
-
 // Token management
 let accessToken: string | null = localStorage.getItem('access_token');
 let refreshToken: string | null = localStorage.getItem('refresh_token');
