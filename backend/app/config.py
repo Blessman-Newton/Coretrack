@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings
 from typing import List
+import os
 
 class Settings(BaseSettings):
     """Application settings"""
@@ -15,7 +16,7 @@ class Settings(BaseSettings):
     # Database
     DATABASE_HOST: str = "core-processing-blessmannewton0-9ae7.i.aivencloud.com"
     DATABASE_PORT: int = 23415
-    import os
+ 
 
     DATABASE_USER: str = os.getenv("DATABASE_USER", "avnadmin")
     DATABASE_PASSWORD: str = os.getenv("DATABASE_PASSWORD", "defaultpassword")
