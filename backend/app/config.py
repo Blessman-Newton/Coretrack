@@ -33,6 +33,12 @@ class Settings(BaseSettings):
     DB_POOL_PRE_PING: bool = True
 
 
+ # Security / JWT
+    SECRET_KEY: str = "RJ-hGtJpimsdF503yZ2y6TT9SKAVkC3YsvKpXG3cHPKUtMLcXUhIeptrv5Z0FXc5duadEe4tqpXlDNn4ci3zBg"
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 7
+
     # CORS
     CORS_ORIGINS: List[str] = [
         "http://localhost:5173",
