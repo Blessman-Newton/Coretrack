@@ -25,6 +25,14 @@ class Settings(BaseSettings):
     DATABASE_SSL_MODE: str = "REQUIRED"
     DATABASE_URL: str | None = None
 
+
+# Database connection pool
+    DB_POOL_SIZE: int = 5
+    DB_MAX_OVERFLOW: int = 10
+    DB_POOL_RECYCLE: int = 3600
+    DB_POOL_PRE_PING: bool = True
+
+
     # CORS
     CORS_ORIGINS: List[str] = [
         "http://localhost:5173",
