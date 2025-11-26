@@ -1,12 +1,37 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { Clock, CheckCircle, Beaker, TrendingUp, Filter, Download } from 'lucide-react';
-import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { Stats } from '../../types';
-import { StatCard } from './StatCard';
-import { RecentActivity } from './RecentActivity';
-import { Dispatch } from '../../types';
-import { format, startOfWeek, endOfWeek, isWithinInterval, parseISO } from 'date-fns';
-import * as XLSX from 'xlsx';
+import React, { useState, useEffect, useMemo } from "react";
+import {
+  Clock,
+  CheckCircle,
+  Beaker,
+  TrendingUp,
+  Filter,
+  Download,
+} from "lucide-react";
+import {
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+import { Stats } from "../../types";
+import { StatCard } from "./StatCard";
+import { RecentActivity } from "./RecentActivity";
+import { Dispatch } from "../../types";
+import {
+  format,
+  startOfWeek,
+  endOfWeek,
+  isWithinInterval,
+  parseISO,
+} from "date-fns";
+import * as XLSX from "xlsx";
 
 interface DashboardProps {
   stats: Stats;
@@ -14,15 +39,26 @@ interface DashboardProps {
   highlightedDispatchId?: number | null;
 }
 
-const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+const COLORS = [
+  "#3b82f6",
+  "#10b981",
+  "#f59e0b",
+  "#ef4444",
+  "#8b5cf6",
+  "#ec4899",
+];
 
-export const Dashboard: React.FC<DashboardProps> = ({ stats, dispatches, highlightedDispatchId }) => {
+export const Dashboard: React.FC<DashboardProps> = ({
+  stats,
+  dispatches,
+  highlightedDispatchId,
+}) => {
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
-    technician: '',
-    week: '',
-    dateRange: { start: '', end: '' },
-    company: '',
+    technician: "",
+    week: "",
+    dateRange: { start: "", end: "" },
+    company: "",
   });
 
   // Get unique values for filters
@@ -53,9 +89,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ stats, dispatches, highlig
 
       // Filter by week
       if (filters.week) {
-        const weekStart = startOfWeek(parseISO(filters.week), { weekStartsOn: 1 });
+        const weekStart = startOfWeek(parseISO(filters.week), {
+          weekStartsOn: 1,
+        });
         const weekEnd = endOfWeek(parseISO(filters.week), { weekStartsOn: 1 });
-        if (!isWithinInterval(dispatchDate, { start: weekStart, end: weekEnd })) {
+        if (
+          !isWithinInterval(dispatchDate, { start: weekStart, end: weekEnd })
+        ) {
           return false;
         }
       }
@@ -76,7 +116,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ stats, dispatches, highlig
   // Prepare chart data
   const dispatchesByCompany = useMemo(() => {
     const grouped = filteredDispatches.reduce((acc, dispatch) => {
-      const company = dispatch.company || 'Unknown';
+      const company = dispatch.company || "Unknown";
       if (!acc[company]) {
         acc[company] = { company, count: 0, samples: 0 };
       }
@@ -89,17 +129,21 @@ export const Dashboard: React.FC<DashboardProps> = ({ stats, dispatches, highlig
   }, [filteredDispatches]);
 
   const statusData = useMemo(() => {
-    const outstanding = filteredDispatches.filter((d) => d.status === 'outstanding').length;
-    const returned = filteredDispatches.filter((d) => d.status === 'returned').length;
+    const outstanding = filteredDispatches.filter(
+      (d) => d.status === "outstanding"
+    ).length;
+    const returned = filteredDispatches.filter(
+      (d) => d.status === "returned"
+    ).length;
     return [
-      { name: 'Outstanding', value: outstanding },
-      { name: 'Returned', value: returned },
+      { name: "Outstanding", value: outstanding },
+      { name: "Returned", value: returned },
     ];
   }, [filteredDispatches]);
 
   const sampleTypeData = useMemo(() => {
     const grouped = filteredDispatches.reduce((acc, dispatch) => {
-      const type = dispatch.sampleType || 'Unknown';
+      const type = dispatch.sampleType || "Unknown";
       if (!acc[type]) {
         acc[type] = { type, count: 0 };
       }
@@ -117,30 +161,32 @@ export const Dashboard: React.FC<DashboardProps> = ({ stats, dispatches, highlig
       Project: d.projectId,
       Drillhole: d.drillholeId,
       Company: d.company,
-      'Dispatch Date': format(parseISO(d.dispatchDate), 'yyyy-MM-dd HH:mm'),
-      'HQ Boxes': d.hqBoxes,
-      'NQ Boxes': d.nqBoxes,
+      "Dispatch Date": format(parseISO(d.dispatchDate), "yyyy-MM-dd HH:mm"),
+      "HQ Boxes": d.hqBoxes,
+      "NQ Boxes": d.nqBoxes,
       Driver: d.driver,
       Technician: d.technician,
-      'Samples Collected': d.samplesCollected,
-      'Sample Type': d.sampleType || '',
+      "Samples Collected": d.samplesCollected,
+      "Sample Type": d.sampleType || "",
       Status: d.status,
-      'Return Date': d.returnDate ? format(parseISO(d.returnDate), 'yyyy-MM-dd HH:mm') : '',
-      'Returned HQ': d.returnedHq || '',
-      'Returned NQ': d.returnedNq || '',
-      'Return Condition': d.returnCondition || '',
+      "Return Date": d.returnDate
+        ? format(parseISO(d.returnDate), "yyyy-MM-dd HH:mm")
+        : "",
+      "Returned HQ": d.returnedHq || "",
+      "Returned NQ": d.returnedNq || "",
+      "Return Condition": d.returnCondition || "",
     }));
 
     const csv = [
-      Object.keys(csvData[0]).join(','),
-      ...csvData.map((row) => Object.values(row).join(',')),
-    ].join('\n');
+      Object.keys(csvData[0]).join(","),
+      ...csvData.map((row) => Object.values(row).join(",")),
+    ].join("\n");
 
-    const blob = new Blob([csv], { type: 'text/csv' });
+    const blob = new Blob([csv], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = `dispatches_${format(new Date(), 'yyyy-MM-dd')}.csv`;
+    a.download = `dispatches_${format(new Date(), "yyyy-MM-dd")}.csv`;
     a.click();
   };
 
@@ -151,58 +197,60 @@ export const Dashboard: React.FC<DashboardProps> = ({ stats, dispatches, highlig
       Project: d.projectId,
       Drillhole: d.drillholeId,
       Company: d.company,
-      'Dispatch Date': format(parseISO(d.dispatchDate), 'yyyy-MM-dd HH:mm'),
-      'HQ Boxes': d.hqBoxes,
-      'NQ Boxes': d.nqBoxes,
+      "Dispatch Date": format(parseISO(d.dispatchDate), "yyyy-MM-dd HH:mm"),
+      "HQ Boxes": d.hqBoxes,
+      "NQ Boxes": d.nqBoxes,
       Driver: d.driver,
       Technician: d.technician,
-      'Samples Collected': d.samplesCollected,
-      'Sample Type': d.sampleType || '',
+      "Samples Collected": d.samplesCollected,
+      "Sample Type": d.sampleType || "",
       Status: d.status,
-      'Return Date': d.returnDate ? format(parseISO(d.returnDate), 'yyyy-MM-dd HH:mm') : '',
-      'Returned HQ': d.returnedHq || '',
-      'Returned NQ': d.returnedNq || '',
-      'Return Condition': d.returnCondition || '',
+      "Return Date": d.returnDate
+        ? format(parseISO(d.returnDate), "yyyy-MM-dd HH:mm")
+        : "",
+      "Returned HQ": d.returnedHq || "",
+      "Returned NQ": d.returnedNq || "",
+      "Return Condition": d.returnCondition || "",
     }));
 
     const ws = XLSX.utils.json_to_sheet(excelData);
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Dispatches');
-    XLSX.writeFile(wb, `dispatches_${format(new Date(), 'yyyy-MM-dd')}.xlsx`);
+    XLSX.utils.book_append_sheet(wb, ws, "Dispatches");
+    XLSX.writeFile(wb, `dispatches_${format(new Date(), "yyyy-MM-dd")}.xlsx`);
   };
 
   const clearFilters = () => {
     setFilters({
-      technician: '',
-      week: '',
-      dateRange: { start: '', end: '' },
-      company: '',
+      technician: "",
+      week: "",
+      dateRange: { start: "", end: "" },
+      company: "",
     });
   };
 
   return (
     <div className="space-y-6">
       {/* Filter Section */}
-      <div className="bg-white rounded-lg shadow p-4">
+      <div className="bg-white rounded-xl shadow-md p-4">
         <div className="flex items-center justify-between mb-4">
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="flex items-center gap-2 px-4 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition-colors"
           >
             <Filter className="w-4 h-4" />
-            {showFilters ? 'Hide Filters' : 'Show Filters'}
+            {showFilters ? "Hide Filters" : "Show Filters"}
           </button>
           <div className="flex gap-2">
             <button
               onClick={exportToCSV}
-              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
             >
               <Download className="w-4 h-4" />
               CSV
             </button>
             <button
               onClick={exportToExcel}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="flex items-center gap-2 px-4 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition-colors"
             >
               <Download className="w-4 h-4" />
               Excel
@@ -214,11 +262,15 @@ export const Dashboard: React.FC<DashboardProps> = ({ stats, dispatches, highlig
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Technician Filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Technician</label>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Technician
+              </label>
               <select
                 value={filters.technician}
-                onChange={(e) => setFilters({ ...filters, technician: e.target.value })}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                onChange={(e) =>
+                  setFilters({ ...filters, technician: e.target.value })
+                }
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 bg-white text-black"
               >
                 <option value="">All Technicians</option>
                 {technicians.map((tech) => (
@@ -231,11 +283,15 @@ export const Dashboard: React.FC<DashboardProps> = ({ stats, dispatches, highlig
 
             {/* Company Filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Company</label>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Company
+              </label>
               <select
                 value={filters.company}
-                onChange={(e) => setFilters({ ...filters, company: e.target.value })}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                onChange={(e) =>
+                  setFilters({ ...filters, company: e.target.value })
+                }
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 bg-white text-black"
               >
                 <option value="">All Companies</option>
                 {companies.map((company) => (
@@ -248,18 +304,24 @@ export const Dashboard: React.FC<DashboardProps> = ({ stats, dispatches, highlig
 
             {/* Week Filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Week</label>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Week
+              </label>
               <input
                 type="week"
                 value={filters.week}
-                onChange={(e) => setFilters({ ...filters, week: e.target.value })}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                onChange={(e) =>
+                  setFilters({ ...filters, week: e.target.value })
+                }
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 bg-white text-black"
               />
             </div>
 
             {/* Date Range Filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Date Range</label>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Date Range
+              </label>
               <div className="flex gap-2">
                 <input
                   type="date"
@@ -267,10 +329,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ stats, dispatches, highlig
                   onChange={(e) =>
                     setFilters({
                       ...filters,
-                      dateRange: { ...filters.dateRange, start: e.target.value },
+                      dateRange: {
+                        ...filters.dateRange,
+                        start: e.target.value,
+                      },
                     })
                   }
-                  className="flex-1 px-2 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+                  className="flex-1 px-2 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 text-sm bg-white text-black"
                 />
                 <input
                   type="date"
@@ -281,7 +346,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ stats, dispatches, highlig
                       dateRange: { ...filters.dateRange, end: e.target.value },
                     })
                   }
-                  className="flex-1 px-2 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+                  className="flex-1 px-2 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 text-sm bg-white text-black"
                 />
               </div>
             </div>
@@ -292,7 +357,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ stats, dispatches, highlig
           <div className="mt-4 flex justify-end">
             <button
               onClick={clearFilters}
-              className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 underline"
+              className="px-4 py-2 text-sm text-slate-600 hover:text-slate-800 underline"
             >
               Clear All Filters
             </button>
@@ -328,15 +393,21 @@ export const Dashboard: React.FC<DashboardProps> = ({ stats, dispatches, highlig
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Dispatches by Company */}
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+        <div className="bg-white p-6 rounded-xl shadow-md">
+          <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
             <TrendingUp className="w-5 h-5" />
             Dispatches by Company
           </h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={dispatchesByCompany}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="company" angle={-45} textAnchor="end" height={100} fontSize={12} />
+              <XAxis
+                dataKey="company"
+                angle={-45}
+                textAnchor="end"
+                height={100}
+                fontSize={12}
+              />
               <YAxis />
               <Tooltip />
               <Legend />
@@ -346,8 +417,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ stats, dispatches, highlig
         </div>
 
         {/* Status Distribution */}
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h3 className="text-lg font-bold mb-4">Status Distribution</h3>
+        <div className="bg-white p-6 rounded-xl shadow-md">
+          <h3 className="text-lg font-bold text-slate-800 mb-4">
+            Status Distribution
+          </h3>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
@@ -361,7 +434,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ stats, dispatches, highlig
                 dataKey="value"
               >
                 {statusData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]}
+                  />
                 ))}
               </Pie>
               <Tooltip />
@@ -370,12 +446,20 @@ export const Dashboard: React.FC<DashboardProps> = ({ stats, dispatches, highlig
         </div>
 
         {/* Samples by Company */}
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h3 className="text-lg font-bold mb-4">Samples by Company</h3>
+        <div className="bg-white p-6 rounded-xl shadow-md">
+          <h3 className="text-lg font-bold text-slate-800 mb-4">
+            Samples by Company
+          </h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={dispatchesByCompany}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="company" angle={-45} textAnchor="end" height={100} fontSize={12} />
+              <XAxis
+                dataKey="company"
+                angle={-45}
+                textAnchor="end"
+                height={100}
+                fontSize={12}
+              />
               <YAxis />
               <Tooltip />
               <Legend />
@@ -385,8 +469,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ stats, dispatches, highlig
         </div>
 
         {/* Sample Types Distribution */}
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h3 className="text-lg font-bold mb-4">Sample Types</h3>
+        <div className="bg-white p-6 rounded-xl shadow-md">
+          <h3 className="text-lg font-bold text-slate-800 mb-4">
+            Sample Types
+          </h3>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
@@ -400,7 +486,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ stats, dispatches, highlig
                 dataKey="count"
               >
                 {sampleTypeData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]}
+                  />
                 ))}
               </Pie>
               <Tooltip />
@@ -410,8 +499,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ stats, dispatches, highlig
       </div>
 
       {/* Recent Activity */}
-      <RecentActivity dispatches={filteredDispatches} highlightedDispatchId={highlightedDispatchId} />
+      <RecentActivity
+        dispatches={filteredDispatches}
+        highlightedDispatchId={highlightedDispatchId}
+      />
     </div>
   );
 };
-
