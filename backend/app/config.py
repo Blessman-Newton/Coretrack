@@ -45,9 +45,10 @@ class Settings(BaseSettings):
         "http://localhost:5173",
         "http://localhost:3000",
         "https://corepro.netlify.app",
+        "*"
     ]
     CORS_ALLOW_CREDENTIALS: bool = True
-    CORS_ALLOW_METHODS: List[str] = ["*"]
+    CORS_ALLOW_METHODS: List[str] = ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"]
     CORS_ALLOW_HEADERS: List[str] = ["*"]
     CORS_EXPOSE_HEADERS: List[str] = ["*"]
 
