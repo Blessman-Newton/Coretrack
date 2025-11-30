@@ -19,10 +19,11 @@ app = FastAPI(
     debug=settings.DEBUG,
 )
 
-# Allowed origins for CORS
+# Allowed origins for CORS - log them for debugging
 allowed_origins = settings.CORS_ORIGINS
+logger.info(f"CORS allowed origins: {allowed_origins}")
 
-# Configure CORS
+# Configure CORS - MUST be added before routes
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,

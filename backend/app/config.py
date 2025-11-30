@@ -1,6 +1,7 @@
 from pydantic_settings import BaseSettings
-from typing import List
+from typing import List, Union
 import os
+import json
 
 class Settings(BaseSettings):
     """Application settings"""
@@ -44,7 +45,6 @@ class Settings(BaseSettings):
         "http://localhost:5173",
         "http://localhost:3000",
         "https://corepro.netlify.app",
-        "https://corepro.netlify.app/",  # with trailing slash
     ]
     CORS_ALLOW_CREDENTIALS: bool = True
     CORS_ALLOW_METHODS: List[str] = ["*"]
@@ -53,6 +53,26 @@ class Settings(BaseSettings):
 
     # Logging
     LOG_LEVEL: str = "INFO"
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        # Handle CORS_ORIGINS from environment variable (might be a JSON string)
+        cors_env = os.getenv("CORS_ORIGINS")
+        if cors_env:
+            try:
+                # Try to parse as JSON array
+                parsed = json.loads(cors_env)
+                if isinstance(parsed, list):
+                    # Add netlify if not already present
+                    if "https://corepro.netlify.app" not in parsed:
+                        parsed.append("https://corepro.netlify.app")
+                    self.CORS_ORIGINS = parsed
+            except json.JSONDecodeError:
+                # If not JSON, treat as comma-separated string
+                origins = [origin.strip() for origin in cors_env.split(",")]
+                if "https://corepro.netlify.app" not in origins:
+                    origins.append("https://corepro.netlify.app")
+                self.CORS_ORIGINS = origins
 
     @property
     def database_url(self) -> str:
