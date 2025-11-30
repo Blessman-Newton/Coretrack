@@ -29,6 +29,8 @@ app.add_middleware(
     allow_credentials=settings.CORS_ALLOW_CREDENTIALS,
     allow_methods=settings.CORS_ALLOW_METHODS,
     allow_headers=settings.CORS_ALLOW_HEADERS,
+    expose_headers=["*"],
+    max_age=3600,
 )
 
 # Include API routes

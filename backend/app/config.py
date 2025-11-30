@@ -43,11 +43,13 @@ class Settings(BaseSettings):
     CORS_ORIGINS: List[str] = [
         "http://localhost:5173",
         "http://localhost:3000",
-        "https://corepro.netlify.app",  # add your deployed frontend
+        "https://corepro.netlify.app",
+        "https://corepro.netlify.app/",  # with trailing slash
     ]
     CORS_ALLOW_CREDENTIALS: bool = True
     CORS_ALLOW_METHODS: List[str] = ["*"]
     CORS_ALLOW_HEADERS: List[str] = ["*"]
+    CORS_EXPOSE_HEADERS: List[str] = ["*"]
 
     # Logging
     LOG_LEVEL: str = "INFO"
