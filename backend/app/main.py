@@ -38,14 +38,20 @@ app.add_middleware(
 app.include_router(api_router, prefix=settings.API_V1_PREFIX)
 
 @app.middleware("http")
-async def log_origin(request: Request, call_next):
+async def cors_handler(request: Request, call_next):
     """
-    Log the origin of incoming requests for debugging CORS
+    Manual CORS handler to ensure headers are set
     """
-    origin = request.headers.get("origin")
-    if origin:
-        logger.info(f"Incoming request from origin: {origin}")
+    if request.method == "OPTIONS":
+        from fastapi import Response
+        response = Response()
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+        response.headers["Access-Control-Allow-Headers"] = "*"
+        return response
+    
     response = await call_next(request)
+    response.headers["Access-Control-Allow-Origin"] = "*"
     return response
 
 @app.on_event("startup")
