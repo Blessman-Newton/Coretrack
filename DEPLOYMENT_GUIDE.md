@@ -1,7 +1,9 @@
 # Deployment Guide - Fixing "Failed to Fetch" Error
 
 ## Problem
+
 The application works locally but returns "failed to fetch" when deployed. This is typically caused by:
+
 1. Incorrect API URL configuration in production
 2. CORS issues between frontend and backend
 3. Missing environment variables
@@ -14,20 +16,23 @@ The frontend now uses a consistent API configuration pattern. Make sure to set t
 
 **For Netlify/Vercel/Other Static Hosts:**
 Set the environment variable:
+
 ```
-VITE_API_BASE_URL=https://coretrack.onrender.com
+PUBLIC_API_BASE_URL=https://coretrack.onrender.com
 ```
 
 **For Local Development:**
+
 ```
-VITE_API_BASE_URL=http://localhost:8000
+PUBLIC_API_BASE_URL=http://localhost:8000
 ```
 
 ### 2. Backend CORS Configuration
 
 Your backend is already configured to allow requests from:
+
 - `http://localhost:5173` (local Vite dev server)
-- `http://localhost:3000` (local React dev server)  
+- `http://localhost:3000` (local React dev server)
 - `https://corepro.netlify.app` (your deployed frontend)
 
 If your frontend is deployed to a different URL, update the `CORS_ORIGINS` in `backend/app/config.py`.
@@ -35,16 +40,19 @@ If your frontend is deployed to a different URL, update the `CORS_ORIGINS` in `b
 ### 3. Deployment Steps
 
 #### Frontend (Netlify)
-1. Set environment variable: `VITE_API_BASE_URL=https://coretrack.onrender.com`
+
+1. Set environment variable: `PUBLIC_API_BASE_URL=https://coretrack.onrender.com`
 2. Build and deploy
 
 #### Backend (Render)
+
 1. Ensure your backend is deployed and accessible at `https://coretrack.onrender.com`
 2. Verify the CORS origins include your frontend URL
 
 ### 4. Testing
 
 After deployment:
+
 1. Open browser developer tools
 2. Check the Network tab for API requests
 3. Verify requests are going to the correct backend URL
@@ -52,7 +60,7 @@ After deployment:
 
 ### 5. Common Issues
 
-- **Wrong API URL**: Check that `VITE_API_BASE_URL` is set correctly
+- **Wrong API URL**: Check that `PUBLIC_API_BASE_URL` is set correctly
 - **CORS Error**: Add your frontend domain to `CORS_ORIGINS` in backend config
 - **SSL Issues**: Ensure both frontend and backend use HTTPS in production
 
